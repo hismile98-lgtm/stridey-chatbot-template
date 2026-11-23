@@ -1,6 +1,6 @@
 # Mẫu chatbot chăm sóc khách hàng (Streamlit + Gemini API)
 
-Mẫu này biến prompt RODES và sổ tay chính sách của nhóm thành một trang web chat công khai, miễn phí. Nhóm **không cần viết code**: chỉ thay hai tệp văn bản, sửa bốn dòng cài đặt và dán khóa API của mình.
+Mẫu này biến prompt RODES và sổ tay chính sách của nhóm thành một trang chat công khai, miễn phí, trông như một ứng dụng nhắn tin: thanh tiêu đề có ảnh đại diện và tên doanh nghiệp, bóng chat hai bên, giờ gửi, gợi ý trả lời nhanh và nhãn nguồn “Mục …” dưới mỗi câu trả lời. Dùng được cho mọi loại doanh nghiệp. Nhóm **không cần viết code**: chỉ thay hai tệp văn bản, sửa phần cài đặt và dán khóa API của mình.
 
 ```
 Khách mở link  →  Ứng dụng trên Streamlit (giữ khóa API)  →  Gemini API
@@ -20,7 +20,9 @@ Khóa API nằm trên máy chủ của Streamlit, khách không bao giờ nhìn 
 | --- | --- |
 | `prompt.md` | Thay bằng prompt RODES của nhóm (phần R, O, D, E) |
 | `so-tay.md` | Thay bằng sổ tay chính sách của cửa hàng nhóm (định dạng Markdown) |
-| `app.py` | Chỉ sửa 4 dòng trong phần **CÀI ĐẶT** ở đầu tệp |
+| `app.py` | Chỉ sửa phần **CÀI ĐẶT** ở đầu tệp |
+| `logo.png` (tùy chọn) | Tải lên logo vuông của doanh nghiệp; không có thì ảnh đại diện là chữ cái đầu |
+| `.streamlit/config.toml` | Giữ nguyên (phông chữ và giao diện chung) |
 | `requirements.txt` | Giữ nguyên |
 | `.streamlit/secrets.toml.example` | Mẫu dòng khóa API để sao chép, không sửa |
 | `.gitignore` | Giữ nguyên |
@@ -41,16 +43,25 @@ Khóa API nằm trên máy chủ của Streamlit, khách không bao giờ nhìn 
 4. Làm tương tự với `so-tay.md`.
    - Nếu sổ tay đang ở Google Docs: **Tệp → Tải xuống → Markdown (.md)**, mở tệp bằng Notepad rồi sao chép toàn bộ.
    - Cuối prompt nhóm nên có câu: “Chỉ dùng thông tin trong SỔ TAY CHÍNH SÁCH KHÁCH HÀNG ở cuối hướng dẫn này.” Ứng dụng tự ghép sổ tay vào sau prompt với đúng tiêu đề đó.
-5. Mở `app.py`, chỉ sửa 4 dòng trong khung **CÀI ĐẶT**:
+5. Mở `app.py`, chỉ sửa khung **CÀI ĐẶT**:
 
-```python
-TEN_BOT = "Stridey"
-TEN_CUA_HANG = "StrideFit"
-GOI_Y_O_NHAP = "Hỏi về đổi trả, giao hàng, bảo hành…"
-HOTLINE = "1900 0000"
-```
+| Dòng | Ý nghĩa | Ví dụ cho một quán ăn |
+| --- | --- | --- |
+| `TEN_CONG_TY` | Tên doanh nghiệp trên thanh tiêu đề | `"Bếp Nhà Mây"` |
+| `TEN_BOT` | Tên trợ lý | `"Mây"` |
+| `TRANG_THAI` | Dòng nhỏ dưới tên | `"Trợ lý AI · trả lời trong vài giây"` |
+| `LOI_CHAO` | Tin nhắn đầu tiên khách thấy | `"Chào bạn, mình là Mây. Mình giải đáp về thực đơn, đặt bàn và giao món."` |
+| `CAU_HOI_GOI_Y` | 2–4 câu hỏi khách bấm để hỏi nhanh | `["Quán mở cửa mấy giờ?", "Đặt bàn thế nào?"]` |
+| `GOI_Y_O_NHAP` | Chữ mờ trong ô nhắn tin | `"Nhắn tin"` |
+| `HOTLINE` | Số gọi trên thanh tiêu đề và trong câu trả lời lỗi | `"1900 1234"` |
+| `MAU_CHU_DAO` | Màu thương hiệu, mã hex (tra trên htmlcolorcodes.com) | `"#C2410C"` |
+| `LOGO` | Tên tệp logo trong kho mã | `"logo.png"` |
 
-Giữ nguyên dấu ngoặc kép. Không sửa các dòng khác.
+Giữ nguyên dấu ngoặc kép, dấu phẩy và dấu ngoặc vuông. Không sửa các dòng khác. Chữ trên bóng chat tự chuyển trắng hoặc đen theo màu bạn chọn.
+
+6. Tùy chọn: thêm logo. Trong kho mã, bấm **Add file → Upload files**, tải lên ảnh vuông tên `logo.png` (hoặc đổi dòng `LOGO` cho đúng tên tệp).
+
+> Lời chào, gợi ý và hotline nằm trong `app.py`; còn cách bot trả lời nằm trong `prompt.md`. Nhớ sửa cả hai cho cùng một doanh nghiệp.
 
 ## Bước 3. Đưa lên Streamlit Community Cloud (10 phút)
 
@@ -81,6 +92,9 @@ Chạy lại 10 ca mẫu ở bước 6 trên trang web và chấm bằng rubric 
 | Bot luôn trả lời “Hệ thống đang bận” | Mở **Manage app** ở góc dưới phải → xem dòng `Gemini API error`. Thường do hết hạn mức miễn phí hoặc model đã đổi tên |
 | Lỗi do model đã đổi tên hoặc ngừng | Thêm dòng `GEMINI_MODEL = "tên-model-mới"` vào Secrets (xem tên ở trang giá của Google AI Studio) |
 | Trang lỗi ngay khi mở, báo thiếu tệp | Kiểm tra `prompt.md` và `so-tay.md` vẫn đúng tên, nằm cùng thư mục với `app.py` |
+| Trang lỗi ngay khi mở, báo `SyntaxError` | Phần CÀI ĐẶT thiếu dấu ngoặc kép, dấu phẩy hoặc ngoặc vuông. So lại với bảng ở bước 2 |
+| Màu không đổi | `MAU_CHU_DAO` phải là mã hex 6 chữ số có dấu `#`, ví dụ `"#C2410C"` |
+| Không có nhãn “Mục …” dưới câu trả lời | Nhãn chỉ hiện khi câu trả lời kết thúc bằng `(Mục …)`. Giữ yêu cầu ghi mục trong `prompt.md` |
 | Bot trả lời sai chính sách | Sửa `so-tay.md` hoặc phần D trong `prompt.md` theo bảng chẩn đoán ở bước 6, rồi Commit. Ứng dụng tự cập nhật |
 
 ## Giới hạn cần ghi trong báo cáo
